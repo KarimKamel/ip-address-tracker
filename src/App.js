@@ -9,23 +9,19 @@ import isValidDomain from 'is-valid-domain';
 import isIp from 'is-ip';
 import { useAlert } from 'react-alert';
 import ErrorMessage from './components/ErrorMessage';
+import LoadingComponent from './components/LoadingComponent';
+import { createUseStyles } from 'react-jss';
+import clsx from 'clsx';
 
-// const getData = async (input) => {
-// 	var res;
-// 	if (isValidDomain) {
-// 		res = await fetch(
-// 			`https://geo.ipify.org/api/v1?apiKey=at_ojgi2vskeKhqPHFldVfDc0kODxpE4&ipAddress=${input}`,
-// 		);
-// 	} else {
-// 		res = await fetch(
-// 			`https://geo.ipify.org/api/v1?apiKey=at_ojgi2vskeKhqPHFldVfDc0kODxpE4&ipAddress=${input}`,
-// 		);
-// 	}
-// const data = await res.json();
-// console.log(data);
+// Strings (variadic)
+clsx('foo', true && 'bar', 'baz');
 
-// return data;
-// };
+const useStyles = createUseStyles({
+	loading: {
+		opacity: '40%',
+	},
+});
+
 const getData = async (input) => {
 	var res;
 	if (isValidDomain(input)) {
@@ -62,9 +58,11 @@ function App() {
 	const [dataIPAddress, setDataIPAddress] = useState('');
 	const [isp, setIsp] = useState('');
 	const [location, setLocation] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
 	const [timezone, setTimezone] = useState('');
 	const [coords, setCoords] = useState({ lat: '', lng: '' });
 	const alert = useAlert();
+	const classes = useStyles();
 
 	const setData = (data) => {
 		setDataIPAddress(data.ip);
@@ -76,10 +74,11 @@ function App() {
 
 	useEffect(() => {
 		const setState = async () => {
+			setIsLoading(true);
 			const ip = await getIPAddress();
-
 			const data = await getData(ip);
 			setData(data);
+			setIsLoading(false);
 		};
 		setState();
 	}, []);
@@ -88,42 +87,51 @@ function App() {
 		setSearchInput(event.target.value);
 	};
 
-	// const handleSubmit = async (event) => {
-	// 	event.preventDefault();
-	// 	getData(searchInput).then((data) => {
-	// 		setData(data);
-	// 	});
-	// };
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		getData(searchInput).then((data) => {
-			console.log(data);
-			if (data.as) {
-				console.log('getting');
-				setData(data);
-			} else {
-				alert.show(<ErrorMessage />);
-			}
-		});
+		setIsLoading(true);
+		const data = await getData(searchInput);
+		if (data.as) {
+			console.log('getting');
+			setData(data);
+			setIsLoading(false);
+		} else {
+			setIsLoading(false);
+			alert.show(<ErrorMessage />);
+		}
 	};
+	const myClass = clsx(
+		isLoading && classes.loading,
+		'flex flex-col w-screen h-screen App relative',
+	);
 
 	return (
-		<div className='flex flex-col w-screen h-screen App'>
-			<Header>
-				<Searchbar
-					onChange={handleChange}
-					onSubmit={handleSubmit}
-					searchInput={searchInput}
-				/>
-				<DataComponent
-					ip={dataIPAddress}
-					isp={isp}
-					timezone={timezone}
-					location={location}
-				/>
-			</Header>
+		// <div className='flex flex-col w-screen h-screen App ' >
+		<div>
+			{/* <LoadingComponent type='spin' color='blue' /> */}
 
-			<MapComponent center={coords} zoom={13} />
+			{isLoading && (
+				<div className='absolute flex justify-center transform -translate-x-1/2 w-96 left-1/2 top-2/3'>
+					<LoadingComponent type='spin' color='blue' />
+				</div>
+			)}
+			<div className={myClass}>
+				<Header>
+					<Searchbar
+						onChange={handleChange}
+						onSubmit={handleSubmit}
+						searchInput={searchInput}
+					/>
+					<DataComponent
+						ip={dataIPAddress}
+						isp={isp}
+						timezone={timezone}
+						location={location}
+					/>
+				</Header>
+
+				<MapComponent center={coords} zoom={13} />
+			</div>
 		</div>
 	);
 }
