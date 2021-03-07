@@ -7,14 +7,12 @@ import MapComponent from './components/MapComponent';
 // const isValidDomain = require('is-valid-domain')
 import isValidDomain from 'is-valid-domain';
 import isIp from 'is-ip';
-import { useAlert } from 'react-alert';
+import { useAlert, positions, transitions, types } from 'react-alert';
 import ErrorMessage from './components/ErrorMessage';
 import LoadingComponent from './components/LoadingComponent';
+
 import { createUseStyles } from 'react-jss';
 import clsx from 'clsx';
-
-// Strings (variadic)
-clsx('foo', true && 'bar', 'baz');
 
 const useStyles = createUseStyles({
 	loading: {
@@ -97,7 +95,16 @@ function App() {
 			setIsLoading(false);
 		} else {
 			setIsLoading(false);
-			alert.show(<ErrorMessage />);
+			alert.show(<ErrorMessage />, {
+				position: positions.BOTTOM_CENTER,
+				type: types.ERROR,
+				timeout: 3000,
+				transition: transitions.SCALE,
+				containerStyle: {
+					zIndex: 100,
+					borderRadius: '3rem',
+				},
+			});
 		}
 	};
 	const myClass = clsx(
@@ -106,15 +113,8 @@ function App() {
 	);
 
 	return (
-		// <div className='flex flex-col w-screen h-screen App ' >
 		<div>
-			{/* <LoadingComponent type='spin' color='blue' /> */}
-
-			{isLoading && (
-				<div className='absolute flex justify-center transform -translate-x-1/2 w-96 left-1/2 top-2/3'>
-					<LoadingComponent type='spin' color='blue' />
-				</div>
-			)}
+			{isLoading && <LoadingComponent type='spin' color='blue' />}
 			<div className={myClass}>
 				<Header>
 					<Searchbar

@@ -9,5 +9,9 @@ const useStyles = createUseStyles({
 
 export default function ErrorMessage() {
 	const classes = useStyles();
-	return <div>Not a valid domain name or IP address</div>;
+	return (
+		<div style={{ textTransform: 'capitalize' }}>
+			Not a valid domain name or IP address
+		</div>
+	);
 }

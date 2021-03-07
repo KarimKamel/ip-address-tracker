@@ -11,21 +11,7 @@ export default function LoadingComponent({ type, color }) {
 		<ReactLoading
 			type={type}
 			color={color}
-			height={'20%'}
-			width={'20%'}
-			className={classes.loading}
+			className='absolute z-20 w-1/2 h-auto transform -translate-x-1/2 opacity-100 md:w-1/6 sm:w-1/4 top-1/2 left-1/2'
 		/>
 	);
 }
-
-// const LoadingComponent = ({ type, color }) => (
-// 	<ReactLoading
-// 		type={type}
-// 		color={color}
-// 		height={'20%'}
-// 		width={'20%'}
-// 		className={classes.loading}
-// 	/>
-// );
-
-// export default LoadingComponent;
