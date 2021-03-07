@@ -52,22 +52,25 @@ const getIPAddress = async () => {
 };
 
 function App() {
-	const [searchInput, setSearchInput] = useState('');
-	const [dataIPAddress, setDataIPAddress] = useState('');
-	const [isp, setIsp] = useState('');
-	const [location, setLocation] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
-	const [timezone, setTimezone] = useState('');
-	const [coords, setCoords] = useState({ lat: '', lng: '' });
 	const alert = useAlert();
 	const classes = useStyles();
+	const [searchInput, setSearchInput] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
+	const [data, setData] = useState({
+		ip: '',
+		location: '',
+		timezone: '',
+		coords: { lat: '', lng: '' },
+	});
 
-	const setData = (data) => {
-		setDataIPAddress(data.ip);
-		setCoords({ lat: data.location.lat, lng: data.location.lng });
-		setIsp(data.isp);
-		setLocation(`${data.location.city}, ${data.location.country}`);
-		setTimezone(data.location.timezone);
+	const updateData = (data) => {
+		setData({
+			ip: data.ip,
+			isp: data.isp,
+			coords: { lat: data.location.lat, lng: data.location.lng },
+			location: `${data.location.city}, ${data.location.country}`,
+			timezone: data.location.timezone,
+		});
 	};
 
 	useEffect(() => {
@@ -75,7 +78,7 @@ function App() {
 			setIsLoading(true);
 			const ip = await getIPAddress();
 			const data = await getData(ip);
-			setData(data);
+			updateData(data);
 			setIsLoading(false);
 		};
 		setState();
@@ -91,7 +94,8 @@ function App() {
 		const data = await getData(searchInput);
 		if (data.as) {
 			console.log('getting');
-			setData(data);
+
+			updateData(data);
 			setIsLoading(false);
 		} else {
 			setIsLoading(false);
@@ -107,7 +111,7 @@ function App() {
 			});
 		}
 	};
-	const myClass = clsx(
+	const loadingClass = clsx(
 		isLoading && classes.loading,
 		'flex flex-col w-screen h-screen App relative',
 	);
@@ -115,22 +119,23 @@ function App() {
 	return (
 		<div>
 			{isLoading && <LoadingComponent type='spin' color='blue' />}
-			<div className={myClass}>
+			<div className={loadingClass}>
 				<Header>
 					<Searchbar
 						onChange={handleChange}
 						onSubmit={handleSubmit}
 						searchInput={searchInput}
 					/>
+
 					<DataComponent
-						ip={dataIPAddress}
-						isp={isp}
-						timezone={timezone}
-						location={location}
+						ip={data.ip}
+						isp={data.isp}
+						timezone={data.timezone}
+						location={data.location}
 					/>
 				</Header>
 
-				<MapComponent center={coords} zoom={13} />
+				<MapComponent center={data.coords} zoom={13} />
 			</div>
 		</div>
 	);

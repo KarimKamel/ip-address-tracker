@@ -1,4 +1,5 @@
 module.exports = {
+	// added important modifier to be able to override loading component styles
 	important: true,
 	purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
 	theme: {

@@ -5,8 +5,6 @@ import ReactTooltip from 'react-tooltip';
 export default function Searchbar(props) {
 	const { searchInput, onChange, onSubmit } = props;
 
-	// const onS;
-
 	return (
 		<form onSubmit={onSubmit} className='flex justify-center pt-3 mb-4'>
 			<div className='relative inline-flex justify-center text-center shadow-md h-14 w-96 sm:w-108'>
